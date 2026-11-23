@@ -275,7 +275,64 @@
       return tex;
     }
 
+    function makeConcreteTex(baseColor = "#cbd2d9") {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      g.fillStyle = baseColor; g.fillRect(0, 0, 512, 512);
+      // Líneas sutiles de juntas de encofrado
+      g.strokeStyle = "rgba(30,41,59,0.12)";
+      g.lineWidth = 2;
+      for (let y = 0; y < 512; y += 64) {
+        g.beginPath(); g.moveTo(0, y); g.lineTo(512, y); g.stroke();
+      }
+      // Grano y porosidad mineral del concreto
+      for (let i = 0; i < 9500; i++) {
+        const v = Math.random();
+        g.fillStyle = v > 0.55 ? "rgba(255,255,255,0.10)" : "rgba(15,23,42,0.11)";
+        g.fillRect(Math.random() * 512, Math.random() * 512, 2 + Math.random() * 2, 2);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 2);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function makeRockTex(baseColor = "#64748b") {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      g.fillStyle = baseColor; g.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 450; i++) {
+        const r = 6 + Math.random() * 22;
+        g.fillStyle = Math.random() > 0.5 ? "rgba(30,41,59,0.22)" : "rgba(226,232,240,0.16)";
+        g.beginPath();
+        g.arc(Math.random() * 512, Math.random() * 512, r, 0, Math.PI * 2);
+        g.fill();
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 3);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
     function buildMaterial(spec) {
+      if (spec.type === "concrete") {
+        return new THREE.MeshStandardMaterial({
+          map: makeConcreteTex(spec.color || "#cfd6dc"),
+          roughness: spec.roughness ?? 0.82,
+          metalness: spec.metalness ?? 0.04,
+        });
+      }
+      if (spec.type === "rock") {
+        return new THREE.MeshStandardMaterial({
+          map: makeRockTex(spec.color || "#5c6773"),
+          roughness: spec.roughness ?? 0.94,
+          metalness: spec.metalness ?? 0.04,
+        });
+      }
       if (spec.type === "wood") {
         return new THREE.MeshStandardMaterial({ map: makeWoodTex(spec.c1, spec.c2), roughness: spec.roughness ?? 0.78 });
       }
@@ -448,6 +505,26 @@
         scene.add(oceanMesh);
       }
 
+      let riverGeo = null;
+      if (env.river) {
+        riverGeo = new THREE.PlaneGeometry(env.river.w || 56, env.river.d || 22, 84, 30);
+        riverGeo.rotateX(-Math.PI / 2);
+        const riverMesh = new THREE.Mesh(
+          riverGeo,
+          new THREE.MeshPhysicalMaterial({
+            color: env.river.color || 0x0284c7,
+            roughness: 0.10,
+            metalness: 0.14,
+            transmission: 0.35,
+            transparent: true,
+            opacity: env.river.opacity ?? 0.82,
+          })
+        );
+        riverMesh.position.set(env.river.x || 0, env.river.y ?? 0.0, env.river.z ?? -13.5);
+        riverMesh.receiveShadow = true;
+        scene.add(riverMesh);
+      }
+
       let floodMesh = null;
       if (env.flood) {
         const fGeo = new THREE.PlaneGeometry(240, 240, 32, 32);
@@ -544,6 +621,37 @@
         }
         g.position.set(px, 0, pz);
         g.scale.setScalar(sc);
+        scene.add(g);
+      }
+
+      // Arboles ribereños / Vegetacion organica
+      for (const [tx, ty, tz, sc] of env.trees || []) {
+        const g = new THREE.Group();
+        const tMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.92 });
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.24, 2.2, 8), tMat);
+        trunk.position.y = 1.1;
+        trunk.castShadow = true;
+        g.add(trunk);
+        const greens = [0x2d6a4f, 0x40916c, 0x1b4332, 0x52b788];
+        const puffs = [
+          [0, 2.7, 0, 1.15],
+          [0.65, 2.3, 0.45, 0.82],
+          [-0.65, 2.35, -0.35, 0.88],
+          [0.15, 3.25, -0.25, 0.78],
+          [-0.35, 2.2, 0.65, 0.72],
+        ];
+        puffs.forEach(([ox, oy, oz, rad], idx) => {
+          const leaf = new THREE.Mesh(
+            new THREE.DodecahedronGeometry(rad, 1),
+            new THREE.MeshStandardMaterial({ color: greens[idx % greens.length], roughness: 0.82 })
+          );
+          leaf.position.set(ox, oy, oz);
+          leaf.castShadow = true;
+          leaf.receiveShadow = true;
+          g.add(leaf);
+        });
+        g.position.set(tx, ty, tz);
+        g.scale.setScalar(sc || 1.0);
         scene.add(g);
       }
 
@@ -676,6 +784,16 @@
             op.setY(i, Math.sin(op.getZ(i) * 0.14 + t * 1.8) * 0.42 + Math.cos(op.getX(i) * 0.09 + t * 1.2) * 0.22);
           }
           op.needsUpdate = true;
+        }
+        if (riverGeo) {
+          const rp = riverGeo.attributes.position;
+          for (let i = 0; i < rp.count; i++) {
+            // Ondas fluyendo claramente de -X (Aguas Arriba) hacia +X (Aguas Abajo)
+            const rx = rp.getX(i), rz = rp.getZ(i);
+            rp.setY(i, Math.sin(rx * 0.55 - t * 3.4) * 0.075 + Math.cos(rz * 0.75 - t * 2.1) * 0.045);
+          }
+          rp.needsUpdate = true;
+          riverGeo.computeVertexNormals();
         }
         groups.upper.position.y += (targetUpperY - groups.upper.position.y) * 0.08;
         groups.roof.position.y += ((targetRoofY + groups.upper.position.y) - groups.roof.position.y) * 0.08;
