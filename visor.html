@@ -138,158 +138,19 @@
       padding: 24px;
       text-align: center;
     }
-    /* Header de controles con boton minimizar */
-    .hud-controls-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(224, 165, 56, 0.25);
-    }
-    .hud-header-title {
-      font-family: "Bahnschrift", "Segoe UI", sans-serif;
-      font-size: 11.5px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #e0a538;
-    }
-    .btn-minimize {
-      background: rgba(224, 165, 56, 0.22);
-      border: 1px solid #e0a538;
-      color: #f8d483;
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 11px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.18s ease;
-    }
-    .btn-minimize:hover {
-      background: #e0a538;
-      color: #0b1622;
-    }
-
-    /* Animacion y paneles ocultables */
-    .hud-controls {
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-      z-index: 100;
-    }
-    .hud-top {
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
-      z-index: 90;
-    }
-    .hud-controls.hidden-panel {
-      transform: translateX(130%);
-      opacity: 0;
-      pointer-events: none;
-    }
-    .hud-top.hidden-panel {
-      transform: translateY(-130%);
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    /* Boton flotante para reabrir controles */
-    .btn-float-reopen {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: linear-gradient(135deg, #e0a538, #c9881e);
-      color: #0b1622;
-      border: 2px solid #ffffff;
-      border-radius: 30px;
-      padding: 10px 18px;
-      font-family: "Bahnschrift", "Segoe UI", sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 16px rgba(224, 165, 56, 0.45);
-      cursor: pointer;
-      z-index: 1000;
-      display: none;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .btn-float-reopen:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 22px rgba(224, 165, 56, 0.65);
-    }
-    .btn-float-reopen.visible {
-      display: inline-flex;
-      animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    @keyframes popIn {
-      from { transform: scale(0.7); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
-
-    /* Boton rapido 3D Libre */
-    .btn-zen {
-      position: fixed;
-      top: 14px;
-      right: 14px;
-      background: rgba(12, 24, 38, 0.92);
-      border: 1px solid #e0a538;
-      color: #f8d483;
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-family: "Bahnschrift", "Segoe UI", sans-serif;
-      font-size: 11.5px;
-      font-weight: 700;
-      cursor: pointer;
-      z-index: 1001;
-      backdrop-filter: blur(8px);
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-      transition: all 0.2s ease;
-    }
-    .btn-zen:hover {
-      background: #e0a538;
-      color: #0b1622;
-    }
-
     @media (max-width: 720px) {
-      .hud-top {
-        max-width: calc(100vw - 110px);
-        top: 10px;
-        left: 10px;
-        padding: 8px 12px;
-      }
-      .hud-top h1 { font-size: 14px; margin-bottom: 2px; }
-      .hud-top p { font-size: 11px; line-height: 1.25; }
-      .back-link { font-size: 11px; margin-bottom: 2px; }
-
+      .hud-top { max-width: calc(100vw - 32px); padding: 10px 12px; }
+      .hud-top h1 { font-size: 15px; }
+      .hud-top p { font-size: 12px; }
       .hud-controls {
         top: auto;
         bottom: 12px;
         right: 12px;
         left: 12px;
         width: auto;
-        padding: 12px;
-        max-height: 48vh;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-      }
-      .hud-controls.hidden-panel {
-        transform: translateY(130%);
-        opacity: 0;
+        padding: 10px;
       }
       .hud-bottom, #hint { display: none; }
-
-      .btn-float-reopen {
-        bottom: 14px;
-        right: 14px;
-        padding: 9px 16px;
-        font-size: 12px;
-      }
     }
   </style>
 </head>
@@ -302,18 +163,7 @@
     <p id="proj-sub"></p>
   </div>
 
-  <button id="btn-zen" class="btn-zen" title="Modo 3D Libre (Ocultar/Ver paneles)">
-    <span id="zen-icon">👁️</span> <span id="zen-text">3D Libre</span>
-  </button>
-
   <div class="hud-controls">
-    <div class="hud-controls-header">
-      <span class="hud-header-title">⚙️ Controles 3D</span>
-      <button id="btn-minimize-hud" class="btn-minimize" title="Ocultar para maniobrar en 3D libremente">
-        ▼ Ocultar Menú
-      </button>
-    </div>
-
     <div class="hud-section-title">Cámaras</div>
     <div id="cam-grid" class="btn-grid"></div>
 
@@ -326,14 +176,10 @@
     <a id="link-drive" class="btn btn-full btn-drive" href="#" target="_blank" rel="noopener">
       Descargar Planos (PDF + DXF)
     </a>
-    <a id="link-github" class="btn btn-full btn-star" href="https://github.com/Davinsoncrb/planos-3d" target="_blank" rel="noopener">
+    <a id="link-github" class="btn btn-full btn-star" href="https://github.com/drakkomaldito/planos-3d" target="_blank" rel="noopener">
       ⭐ Dar Estrella en GitHub
     </a>
   </div>
-
-  <button id="btn-reopen-hud" class="btn-float-reopen" title="Abrir controles e inspección 3D">
-    ⚙️ Controles 3D
-  </button>
 
   <div id="badges-box" class="hud-bottom"></div>
   <div id="hint">Arrastra: rotar 360° · Rueda: zoom · Clic derecho: desplazar</div>
@@ -353,7 +199,7 @@
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
     const params = new URLSearchParams(window.location.search);
-    const projectId = (params.get("p") || "casa-mexico-5x12").replace(/[^a-zA-Z0-9_-]/g, "");
+    const projectId = (params.get("p") || "casa-playa-usa").replace(/[^a-zA-Z0-9_-]/g, "");
 
     async function loadProject() {
       const res = await fetch(`./datos/${projectId}.json`, { cache: "no-store" });
@@ -594,14 +440,36 @@
         scene.add(floodMesh);
       }
 
-      // Geometria de cajas desde JSON
-      for (const b of data.boxes || []) {
-        const mesh = new THREE.Mesh(new THREE.BoxGeometry(b.w, b.h, b.d), mats[b.mat] || mats.trim);
+      // Geometria de cajas desde JSON (soporta boxes o elements)
+      const listaCajas = data.boxes || data.elements || [];
+      for (const b of listaCajas) {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(b.w, b.h, b.d), mats[b.mat] || mats.trim || new THREE.MeshStandardMaterial({ color: 0x94a3b8 }));
         mesh.position.set(b.x, b.y, b.z);
+        if (b.rotX) mesh.rotation.x = b.rotX;
+        if (b.rotY) mesh.rotation.y = b.rotY;
+        if (b.rotZ) mesh.rotation.z = b.rotZ;
         const sh = b.shadow !== false;
         mesh.castShadow = sh;
         mesh.receiveShadow = sh;
-        (groups[b.group || "base"] || groups.base).add(mesh);
+        const grpName = b.group === "lower" ? "base" : (b.group || "base");
+        (groups[grpName] || groups.base).add(mesh);
+      }
+
+      // Geometria de cilindros opcionales
+      for (const c of data.cylinders || []) {
+        const rTop = c.rt !== undefined ? c.rt : (c.r || 0.5);
+        const rBot = c.rb !== undefined ? c.rb : (c.r || 0.5);
+        const geoC = new THREE.CylinderGeometry(rTop, rBot, c.h || 1.0, c.seg || 24);
+        const meshC = new THREE.Mesh(geoC, mats[c.mat] || mats.trim || new THREE.MeshStandardMaterial({ color: 0x3b82f6 }));
+        meshC.position.set(c.x, c.y, c.z);
+        if (c.rotX) meshC.rotation.x = c.rotX;
+        if (c.rotY) meshC.rotation.y = c.rotY;
+        if (c.rotZ) meshC.rotation.z = c.rotZ;
+        const sh = c.shadow !== false;
+        meshC.castShadow = sh;
+        meshC.receiveShadow = sh;
+        const grpName = c.group === "lower" ? "base" : (c.group || "base");
+        (groups[grpName] || groups.base).add(meshC);
       }
 
       // Arriostramientos diagonales
@@ -776,54 +644,6 @@
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
       });
-
-      // Lógica de Ocultar / Mostrar Controles
-      const hudControls = document.querySelector(".hud-controls");
-      const hudTop = document.querySelector(".hud-top");
-      const btnMinimize = document.getElementById("btn-minimize-hud");
-      const btnReopen = document.getElementById("btn-reopen-hud");
-      const btnZen = document.getElementById("btn-zen");
-      const zenText = document.getElementById("zen-text");
-      const zenIcon = document.getElementById("zen-icon");
-
-      let isControlsHidden = false;
-      let isZenMode = false;
-
-      function setControlsHidden(hidden) {
-        isControlsHidden = hidden;
-        if (hidden) {
-          hudControls.classList.add("hidden-panel");
-          btnReopen.classList.add("visible");
-        } else {
-          hudControls.classList.remove("hidden-panel");
-          btnReopen.classList.remove("visible");
-        }
-      }
-
-      btnMinimize.onclick = () => setControlsHidden(true);
-
-      btnReopen.onclick = () => {
-        isZenMode = false;
-        hudTop.classList.remove("hidden-panel");
-        setControlsHidden(false);
-        zenText.textContent = "3D Libre";
-        zenIcon.textContent = "👁️";
-      };
-
-      btnZen.onclick = () => {
-        isZenMode = !isZenMode;
-        if (isZenMode) {
-          hudTop.classList.add("hidden-panel");
-          setControlsHidden(true);
-          zenText.textContent = "Ver Menú";
-          zenIcon.textContent = "📋";
-        } else {
-          hudTop.classList.remove("hidden-panel");
-          setControlsHidden(false);
-          zenText.textContent = "3D Libre";
-          zenIcon.textContent = "👁️";
-        }
-      };
 
       const clock = new THREE.Clock();
       function animate() {
