@@ -785,16 +785,6 @@
           }
           op.needsUpdate = true;
         }
-        if (riverGeo) {
-          const rp = riverGeo.attributes.position;
-          for (let i = 0; i < rp.count; i++) {
-            // Ondas fluyendo claramente de -X (Aguas Arriba) hacia +X (Aguas Abajo)
-            const rx = rp.getX(i), rz = rp.getZ(i);
-            rp.setY(i, Math.sin(rx * 0.55 - t * 3.4) * 0.075 + Math.cos(rz * 0.75 - t * 2.1) * 0.045);
-          }
-          rp.needsUpdate = true;
-          riverGeo.computeVertexNormals();
-        }
         groups.upper.position.y += (targetUpperY - groups.upper.position.y) * 0.08;
         groups.roof.position.y += ((targetRoofY + groups.upper.position.y) - groups.roof.position.y) * 0.08;
         if (floodMesh && floodMesh.visible) {
