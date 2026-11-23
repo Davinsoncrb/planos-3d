@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visor 3D — Casa de Playa USA (FEMA Zone VE)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      overflow: hidden;
+      background: #0b1622;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: #f1f5f9;
+      user-select: none;
+    }
+    #canvas-container { width: 100vw; height: 100vh; display: block; }
+
+    .hud-top {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      background: rgba(12, 24, 38, 0.84);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(224, 165, 56, 0.45);
+      border-left: 4px solid #e0a538;
+      border-radius: 10px;
+      padding: 12px 18px;
+      max-width: 440px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+    .hud-top h1 {
+      font-family: "Bahnschrift", "Segoe UI", sans-serif;
+      font-size: 19px;
+      letter-spacing: 0.6px;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+    .hud-top p {
+      font-size: 12.5px;
+      color: #e9c77b;
+      line-height: 1.35;
+    }
+
+    .hud-controls {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 252px;
+      background: rgba(12, 24, 38, 0.86);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    }
+    .hud-section-title {
+      font-family: "Bahnschrift", "Segoe UI", sans-serif;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #e0a538;
+      margin: 8px 0 6px;
+    }
+    .hud-section-title:first-child { margin-top: 0; }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    .btn {
+      background: rgba(30, 48, 70, 0.9);
+      color: #e2e8f0;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 7px;
+      padding: 7px 8px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      text-align: center;
+    }
+    .btn:hover { background: rgba(45, 72, 105, 0.95); border-color: #e0a538; }
+    .btn.active {
+      background: #e0a538;
+      color: #0f172a;
+      font-weight: 700;
+      border-color: #f8d483;
+    }
+    .btn-full {
+      width: 100%;
+      margin-top: 6px;
+      padding: 8px;
+      font-weight: 600;
+    }
+    .btn-capture {
+      background: linear-gradient(135deg, #1d4ed8, #0284c7);
+      border-color: #38bdf8;
+      color: #ffffff;
+    }
+    .btn-capture:hover { filter: brightness(1.12); }
+    .btn-drive {
+      display: block;
+      text-decoration: none;
+      background: linear-gradient(135deg, #16a34a, #15803d);
+      border-color: #4ade80;
+      color: #ffffff;
+    }
+    .btn-drive:hover { filter: brightness(1.1); }
+    .btn-star {
+      display: block;
+      text-decoration: none;
+      background: rgba(224, 165, 56, 0.16);
+      border-color: #e0a538;
+      color: #f8d483;
+    }
+    .btn-star:hover { background: #e0a538; color: #0f172a; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 6px;
+      font-size: 11.5px;
+      color: #93c5fd;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
+    @media (max-width: 720px) {
+      .hud-top { max-width: calc(100vw - 32px); padding: 10px 12px; }
+      .hud-top h1 { font-size: 15px; }
+      .hud-top p { font-size: 11.5px; }
+      .hud-controls {
+        top: auto;
+        bottom: 12px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        padding: 10px;
+      }
+      .hud-bottom, #hint { display: none; }
+    }
+
+    .hud-bottom {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      background: rgba(12, 24, 38, 0.82);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+    }
+    .badge strong {
+      font-family: "Bahnschrift", "Segoe UI", sans-serif;
+      color: #f6c453;
+      margin-right: 4px;
+    }
+    #hint {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      font-size: 11.5px;
+      color: rgba(226, 232, 240, 0.82);
+      background: rgba(12, 24, 38, 0.72);
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div id="canvas-container"></div>
+
+  <div class="hud-top">
+    <a class="back-link" href="../">← Ver todos los planos</a>
+    <h1>CASA DE PLAYA USA — FEMA ZONE VE</h1>
+    <p>24' × 40' (7.32 × 12.19 m) · 20 Pilotes empotrados -16' en arena · Piso +12'-0" · Techo Hip Roof 5:12</p>
+  </div>
+
+  <div class="hud-controls">
+    <div class="hud-section-title">Cámaras</div>
+    <div class="btn-grid">
+      <button class="btn" onclick="setCamera('hero')">Vista Hero</button>
+      <button class="btn" onclick="setCamera('ocean')">Frente al Mar</button>
+      <button class="btn" onclick="setCamera('pilings')">Bajo Pilotes</button>
+      <button class="btn" onclick="setCamera('top')">Planta 3D</button>
+    </div>
+
+    <div class="hud-section-title">Inspección Técnica</div>
+    <button id="btn-xray" class="btn btn-full" onclick="toggleXray()">Rayos X Arena (Ver Pilotes -16')</button>
+    <button id="btn-flood" class="btn btn-full" onclick="toggleFlood()">Simular Inundación BFE (+9'-0")</button>
+    <button id="btn-roof" class="btn btn-full" onclick="toggleRoof()">Levantar Techo (Ver Interior)</button>
+    <button id="btn-sun" class="btn btn-full" onclick="toggleSunset()">Modo Atardecer Dorado</button>
+    <button class="btn btn-full btn-capture" onclick="captureSquare()">Capturar Foto 3D (1:1 PNG)</button>
+
+    <div class="hud-section-title">Descarga y Apoyo</div>
+    <a class="btn btn-full btn-drive" href="https://drive.google.com/drive/folders/1XDAKmyvb106Ur9Gl4cglAFWBrIf-xdK7" target="_blank" rel="noopener">
+      Descargar Planos (PDF + 5 DXF)
+    </a>
+    <a class="btn btn-full btn-star" href="https://github.com/drakkomaldito/planos-3d" target="_blank" rel="noopener">
+      ⭐ Dar Estrella en GitHub
+    </a>
+  </div>
+
+  <div class="hud-bottom">
+    <div class="badge"><strong>BFE</strong> +9'-0"</div>
+    <div class="badge"><strong>LHSM / DFE</strong> +11'-0" (+2' Freeboard)</div>
+    <div class="badge"><strong>PILOTES</strong> 20 × 12" (-16'-0")</div>
+    <div class="badge"><strong>VIENTO</strong> 150 mph (ASCE 7)</div>
+  </div>
+  <div id="hint">Arrastra: rotar 360° · Rueda: zoom · Clic derecho: desplazar</div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    // Conversor exacto desde coordenadas CAD (en pies: X=0..24, Y=0..40) a 3D
+    const to3D = (xc, yc, zElev = 0) => new THREE.Vector3(xc - 12.0, zElev, 20.0 - yc);
+
+    // Escena, camara y renderizador PBR
+    const container = document.getElementById("canvas-container");
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0xcde7f7, 0.0042);
+
+    const camera = new THREE.PerspectiveCamera(44, window.innerWidth / window.innerHeight, 0.3, 600);
+    camera.position.set(38, 22, 46);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.08;
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.target.set(0, 12, 2);
+    controls.maxPolarAngle = Math.PI * 0.62;
+    controls.minDistance = 12;
+    controls.maxDistance = 140;
+
+    // Texturas procedurales de alta nitidez (sin depender de archivos externos)
+    function crearTexturaSiding() {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      g.fillStyle = "#f2f5f7";
+      g.fillRect(0, 0, 512, 512);
+      for (let y = 0; y < 512; y += 32) {
+        const grad = g.createLinearGradient(0, y, 0, y + 32);
+        grad.addColorStop(0, "#ffffff");
+        grad.addColorStop(0.86, "#e5ecef");
+        grad.addColorStop(1, "#c2ced4");
+        g.fillStyle = grad;
+        g.fillRect(0, y, 512, 32);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(3, 2);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function crearTexturaMadera(colorBase = "#a8794c", colorVeta = "#865c36") {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      g.fillStyle = colorBase;
+      g.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 64; i++) {
+        g.fillStyle = i % 2 === 0 ? colorVeta : "rgba(255,255,255,0.06)";
+        g.fillRect(0, i * 8, 512, 2);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(2, 4);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function crearTexturaMetalRoof() {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      g.fillStyle = "#364554";
+      g.fillRect(0, 0, 512, 512);
+      for (let x = 0; x < 512; x += 32) {
+        g.fillStyle = "#4c5f72";
+        g.fillRect(x, 0, 4, 512);
+        g.fillStyle = "#222d38";
+        g.fillRect(x + 4, 0, 3, 512);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(6, 2);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function crearTexturaArena() {
+      const c = document.createElement("canvas");
+      c.width = 512; c.height = 512;
+      const g = c.getContext("2d");
+      g.fillStyle = "#e6d2a8";
+      g.fillRect(0, 0, 512, 512);
+      for (let i = 0; i < 9000; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 512;
+        g.fillStyle = Math.random() > 0.5 ? "rgba(180,150,100,0.22)" : "rgba(255,248,225,0.28)";
+        g.fillRect(x, y, 2, 2);
+      }
+      const tex = new THREE.CanvasTexture(c);
+      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+      tex.repeat.set(16, 16);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    // Iluminacion fisica costera
+    const hemiLight = new THREE.HemisphereLight(0xbbe4ff, 0xe4cca0, 0.95);
+    scene.add(hemiLight);
+
+    const sunLight = new THREE.DirectionalLight(0xfff6e5, 2.2);
+    sunLight.position.set(55, 68, 45);
+    sunLight.castShadow = true;
+    sunLight.shadow.mapSize.set(2048, 2048);
+    sunLight.shadow.camera.near = 5;
+    sunLight.shadow.camera.far = 200;
+    const d = 55;
+    sunLight.shadow.camera.left = -d;
+    sunLight.shadow.camera.right = d;
+    sunLight.shadow.camera.top = d;
+    sunLight.shadow.camera.bottom = -d;
+    sunLight.shadow.bias = -0.0005;
+    scene.add(sunLight);
+
+    // Domo de cielo con degradado
+    const skyGeo = new THREE.SphereGeometry(280, 32, 20);
+    const skyMat = new THREE.ShaderMaterial({
+      side: THREE.BackSide,
+      uniforms: {
+        topColor: { value: new THREE.Color(0x2a76c7) },
+        bottomColor: { value: new THREE.Color(0xdcf1ff) },
+      },
+      vertexShader: `
+        varying vec3 vWorldPos;
+        void main() {
+          vec4 wp = modelMatrix * vec4(position, 1.0);
+          vWorldPos = wp.xyz;
+          gl_Position = projectionMatrix * viewMatrix * wp;
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 topColor;
+        uniform vec3 bottomColor;
+        varying vec3 vWorldPos;
+        void main() {
+          float h = normalize(vWorldPos).y;
+          gl_FragColor = vec4(mix(bottomColor, topColor, pow(max(h, 0.0), 0.65)), 1.0);
+        }
+      `,
+    });
+    scene.add(new THREE.Mesh(skyGeo, skyMat));
+
+    // Materiales arquitectonicos PBR
+    const matPilote = new THREE.MeshStandardMaterial({ map: crearTexturaMadera("#8d6742", "#6b4c2e"), roughness: 0.82 });
+    const matViga = new THREE.MeshStandardMaterial({ map: crearTexturaMadera("#7c5937", "#5c3f24"), roughness: 0.78 });
+    const matDeck = new THREE.MeshStandardMaterial({ map: crearTexturaMadera("#b68655", "#96693c"), roughness: 0.72 });
+    const matSiding = new THREE.MeshStandardMaterial({ map: crearTexturaSiding(), roughness: 0.55 });
+    const matTrim = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.42 });
+    const matBreakaway = new THREE.MeshStandardMaterial({ color: 0xc9d7df, roughness: 0.65 });
+    const matTecho = new THREE.MeshStandardMaterial({ map: crearTexturaMetalRoof(), roughness: 0.35, metalness: 0.45 });
+    const matVidrio = new THREE.MeshPhysicalMaterial({
+      color: 0x7bc2e6,
+      roughness: 0.08,
+      metalness: 0.1,
+      transmission: 0.62,
+      transparent: true,
+      opacity: 0.72,
+    });
+    const matAcero = new THREE.MeshStandardMaterial({ color: 0x9aa7b4, roughness: 0.3, metalness: 0.85 });
+    const matInterior = new THREE.MeshStandardMaterial({ color: 0xf7f5f0, roughness: 0.85 });
+    const matPisoInt = new THREE.MeshStandardMaterial({ map: crearTexturaMadera("#cfa77b", "#b98e62"), roughness: 0.6 });
+
+    function addBox(parent, w, h, d, x, y, z, mat, shadow = true) {
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+      mesh.position.set(x, y, z);
+      mesh.castShadow = shadow;
+      mesh.receiveShadow = shadow;
+      parent.add(mesh);
+      return mesh;
+    }
+
+    // =========================================================================
+    // 1. TERRENO DE ARENA COSTERO Y OCEANO ANIMADO
+    // =========================================================================
+    const sandGeo = new THREE.PlaneGeometry(240, 240, 80, 80);
+    sandGeo.rotateX(-Math.PI / 2);
+    const pos = sandGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const px = pos.getX(i);
+      const pz = pos.getZ(i);
+      let h = 0;
+      if (pz > 28) {
+        // Pendiente suave hacia la orilla y fondo marino
+        h = -Math.min(7.5, (pz - 28) * 0.14);
+      } else {
+        // Ondulacion natural de dunas fuera de la huella
+        const dist = Math.hypot(px, pz);
+        if (dist > 26) h = Math.sin(px * 0.08) * Math.cos(pz * 0.07) * 1.1;
+      }
+      pos.setY(i, h);
+    }
+    sandGeo.computeVertexNormals();
+    const matArena = new THREE.MeshStandardMaterial({
+      map: crearTexturaArena(),
+      roughness: 0.94,
+      transparent: true,
+      opacity: 1.0,
+    });
+    const sandMesh = new THREE.Mesh(sandGeo, matArena);
+    sandMesh.receiveShadow = true;
+    scene.add(sandMesh);
+
+    // Plano de socavacion (-4'-0") visible en modo Rayos X
+    const scourPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(36, 52),
+      new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.22, side: THREE.DoubleSide })
+    );
+    scourPlane.rotation.x = -Math.PI / 2;
+    scourPlane.position.set(0, -4.0, 0);
+    scourPlane.visible = false;
+    scene.add(scourPlane);
+
+    // Oceano animado (normal en -1.8', sube a +9.0' en modo Simulacion BFE)
+    const oceanGeo = new THREE.PlaneGeometry(300, 180, 72, 48);
+    oceanGeo.rotateX(-Math.PI / 2);
+    const matOcean = new THREE.MeshPhysicalMaterial({
+      color: 0x0b7aa6,
+      roughness: 0.14,
+      metalness: 0.12,
+      transparent: true,
+      opacity: 0.84,
+    });
+    const oceanMesh = new THREE.Mesh(oceanGeo, matOcean);
+    oceanMesh.position.set(0, -1.6, 118);
+    scene.add(oceanMesh);
+
+    // Plano de inundacion FEMA BFE (+9'-0")
+    const floodGeo = new THREE.PlaneGeometry(240, 240, 48, 48);
+    floodGeo.rotateX(-Math.PI / 2);
+    const floodMesh = new THREE.Mesh(
+      floodGeo,
+      new THREE.MeshPhysicalMaterial({
+        color: 0x0ea5e9,
+        roughness: 0.12,
+        transparent: true,
+        opacity: 0.62,
+      })
+    );
+    floodMesh.position.y = -3.0;
+    floodMesh.visible = false;
+    scene.add(floodMesh);
+
+    // =========================================================================
+    // 2. ESTRUCTURA DE CIMENTACION: 20 PILOTES (-16' A +11') + VIGAS MADRE
+    // =========================================================================
+    const houseGroup = new THREE.Group();
+    scene.add(houseGroup);
+
+    const ejesX = [0, 8, 16, 24];
+    const ejesY = [0, 8, 20, 30, 40];
+
+    for (const xc of ejesX) {
+      for (const yc of ejesY) {
+        const p = to3D(xc, yc, 0);
+        // Pilote 12"x12" (1' x 1') de -16' a +11' (altura 27')
+        addBox(houseGroup, 1.0, 27.0, 1.0, p.x, -2.5, p.z, matPilote);
+        // Collarin / Hurricane Tie metalico Inox 316 en cabeza del pilote
+        addBox(houseGroup, 1.16, 0.9, 1.16, p.x, 10.65, p.z, matAcero);
+      }
+    }
+
+    // Vigas madre longitudinales (ejes A-D) y transversales (ejes 1-5) en +11.0 a +11.8
+    for (const xc of ejesX) {
+      const x3 = xc - 12.0;
+      addBox(houseGroup, 0.65, 0.95, 41.2, x3, 11.45, 0, matViga);
+    }
+    for (const yc of ejesY) {
+      const z3 = 20.0 - yc;
+      addBox(houseGroup, 25.2, 0.85, 0.55, 0, 11.4, z3, matViga);
+    }
+
+    // Arriostramientos diagonales (Cross-Bracing) frontales y traseros
+    function addBrace(p1, p2) {
+      const dist = p1.distanceTo(p2);
+      const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.32, dist, 0.32), matViga);
+      mesh.position.copy(p1).add(p2).multiplyScalar(0.5);
+      mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), p2.clone().sub(p1).normalize());
+      mesh.castShadow = true;
+      houseGroup.add(mesh);
+    }
+    for (const yc of [0, 40]) {
+      const z3 = 20.0 - yc;
+      addBrace(new THREE.Vector3(-12, 1.2, z3), new THREE.Vector3(-4, 10.4, z3));
+      addBrace(new THREE.Vector3(-4, 1.2, z3), new THREE.Vector3(-12, 10.4, z3));
+      addBrace(new THREE.Vector3(4, 1.2, z3), new THREE.Vector3(12, 10.4, z3));
+      addBrace(new THREE.Vector3(12, 1.2, z3), new THREE.Vector3(4, 10.4, z3));
+    }
+
+    // Losa de sacrificio 4" bajo zona de estacionamiento + Breakaway Wall central (ejes B-C, Y=8..30)
+    addBox(houseGroup, 24.4, 0.35, 32.4, 0, 0.18, -4.0, new THREE.MeshStandardMaterial({ color: 0xd8dce0, roughness: 0.9 }));
+    addBox(houseGroup, 7.2, 10.3, 20.0, 0, 5.3, -5.0, matBreakaway);
+    // Puerta de garaje / servicio en el Breakaway Wall
+    addBox(houseGroup, 5.2, 7.2, 0.25, 0, 3.8, 5.05, matTrim);
+
+    // =========================================================================
+    // 3. PLATAFORMA HABITABLE (+12'-0") Y DECK FRENTE AL MAR
+    // =========================================================================
+    // Deck frontal (24' x 8', Z = +12..+20)
+    addBox(houseGroup, 24.6, 0.45, 8.2, 0, 12.1, 16.0, matDeck);
+    // Piso interior (24' x 32', Z = -20..+12)
+    addBox(houseGroup, 24.4, 0.45, 32.2, 0, 12.1, -4.0, matPisoInt);
+
+    // Baranda costera del Deck frontal (altura 3.5', postes + pasamanos + cables inox)
+    addBox(houseGroup, 24.6, 0.22, 0.28, 0, 15.6, 20.0, matTrim);
+    addBox(houseGroup, 0.28, 0.22, 8.2, -12.15, 15.6, 16.0, matTrim);
+    addBox(houseGroup, 0.28, 0.22, 8.2, 12.15, 15.6, 16.0, matTrim);
+    for (let x = -12; x <= 12; x += 4) {
+      addBox(houseGroup, 0.34, 3.4, 0.34, x, 13.9, 20.0, matTrim);
+    }
+    for (const hCable of [13.0, 13.7, 14.4, 15.1]) {
+      addBox(houseGroup, 24.2, 0.05, 0.05, 0, hCable, 20.0, matAcero, false);
+      addBox(houseGroup, 0.05, 0.05, 8.0, -12.15, hCable, 16.0, matAcero, false);
+      addBox(houseGroup, 0.05, 0.05, 8.0, 12.15, hCable, 16.0, matAcero, false);
+    }
+    // 4 Columnas del porche frontal sosteniendo el alero del techo sobre el Deck
+    for (const xc of ejesX) {
+      addBox(houseGroup, 0.62, 9.0, 0.62, xc - 12.0, 16.8, 19.7, matTrim);
+    }
+
+    // =========================================================================
+    // 4. MUROS EXTERIORES CON VANOS REALES + VENTANAS IMPACT-RATED
+    // =========================================================================
+    const hBase = 12.32;
+    const hMuro = 9.0;
+
+    // Fachada frontal al mar (Z = +12, X = -12..+12)
+    // Tramos llenos alrededor de puerta (X=-10..-6.5) y gran ventanal (X=-3.5..+9.0)
+    addBox(houseGroup, 2.0, hMuro, 0.55, -11.0, hBase + hMuro / 2, 12.0, matSiding);
+    addBox(houseGroup, 3.5, 1.8, 0.55, -8.25, hBase + 8.1, 12.0, matSiding);
+    addBox(houseGroup, 3.0, hMuro, 0.55, -5.0, hBase + hMuro / 2, 12.0, matSiding);
+    addBox(houseGroup, 12.5, 2.0, 0.55, 2.75, hBase + 1.0, 12.0, matSiding);
+    addBox(houseGroup, 12.5, 1.6, 0.55, 2.75, hBase + 8.2, 12.0, matSiding);
+    addBox(houseGroup, 3.0, hMuro, 0.55, 10.5, hBase + hMuro / 2, 12.0, matSiding);
+    // Puerta principal impacto + gran ventanal impacto 12.5' x 5.4'
+    addBox(houseGroup, 3.4, 7.2, 0.2, -8.25, hBase + 3.6, 12.0, matVidrio, false);
+    addBox(houseGroup, 3.6, 0.25, 0.4, -8.25, hBase + 7.2, 12.0, matTrim);
+    addBox(houseGroup, 12.4, 5.4, 0.18, 2.75, hBase + 4.7, 12.0, matVidrio, false);
+    for (const mx of [-3.5, 0.65, 4.85, 9.0]) {
+      addBox(houseGroup, 0.22, 5.5, 0.35, mx, hBase + 4.7, 12.0, matTrim);
+    }
+
+    // Muros laterales izquierdo (X=-12) y derecho (X=+12), de Z=-20 a +12 (32')
+    function buildSideWall(xPos, ventanasZ) {
+      let cursor = -20.0;
+      for (const [zIni, zFin] of ventanasZ) {
+        if (zIni > cursor) {
+          addBox(houseGroup, 0.55, hMuro, zIni - cursor, xPos, hBase + hMuro / 2, (cursor + zIni) / 2, matSiding);
+        }
+        const len = zFin - zIni;
+        const zMid = (zIni + zFin) / 2;
+        addBox(houseGroup, 0.55, 2.6, len, xPos, hBase + 1.3, zMid, matSiding);
+        addBox(houseGroup, 0.55, 1.6, len, xPos, hBase + 8.2, zMid, matSiding);
+        addBox(houseGroup, 0.18, 4.8, len - 0.2, xPos, hBase + 5.0, zMid, matVidrio, false);
+        addBox(houseGroup, 0.36, 0.22, len, xPos, hBase + 2.65, zMid, matTrim);
+        addBox(houseGroup, 0.36, 0.22, len, xPos, hBase + 7.35, zMid, matTrim);
+        cursor = zFin;
+      }
+      if (cursor < 12.0) {
+        addBox(houseGroup, 0.55, hMuro, 12.0 - cursor, xPos, hBase + hMuro / 2, (cursor + 12.0) / 2, matSiding);
+      }
+    }
+    buildSideWall(-12.0, [[-17.5, -12.5], [-8.0, -3.0], [3.0, 9.0]]);
+    buildSideWall(12.0, [[-17.5, -12.5], [-5.5, -2.0], [3.5, 9.0]]);
+
+    // Fachada trasera (Z = -20) con puerta trasera a escalera y 2 ventanas
+    addBox(houseGroup, 2.5, hMuro, 0.55, -10.75, hBase + hMuro / 2, -20.0, matSiding);
+    addBox(houseGroup, 5.5, 2.6, 0.55, -6.75, hBase + 1.3, -20.0, matSiding);
+    addBox(houseGroup, 5.5, 1.6, 0.55, -6.75, hBase + 8.2, -20.0, matSiding);
+    addBox(houseGroup, 5.4, 4.8, 0.18, -6.75, hBase + 5.0, -20.0, matVidrio, false);
+    addBox(houseGroup, 2.5, hMuro, 0.55, -2.75, hBase + hMuro / 2, -20.0, matSiding);
+    addBox(houseGroup, 3.0, 1.8, 0.55, 0.0, hBase + 8.1, -20.0, matSiding);
+    addBox(houseGroup, 2.9, 7.2, 0.22, 0.0, hBase + 3.6, -20.0, matTrim);
+    addBox(houseGroup, 2.5, hMuro, 0.55, 2.75, hBase + hMuro / 2, -20.0, matSiding);
+    addBox(houseGroup, 5.5, 2.6, 0.55, 6.75, hBase + 1.3, -20.0, matSiding);
+    addBox(houseGroup, 5.5, 1.6, 0.55, 6.75, hBase + 8.2, -20.0, matSiding);
+    addBox(houseGroup, 5.4, 4.8, 0.18, 6.75, hBase + 5.0, -20.0, matVidrio, false);
+    addBox(houseGroup, 2.5, hMuro, 0.55, 10.75, hBase + hMuro / 2, -20.0, matSiding);
+
+    // =========================================================================
+    // 5. INTERIOR REAL AMOBLADO (VISIBLE AL LEVANTAR EL TECHO O POR VENTANAS)
+    // =========================================================================
+    const intH = 8.4;
+    // Tabiques interiores exactos segun ARQ-01
+    addBox(houseGroup, 9.8, intH, 0.35, -7.0, hBase + intH / 2, 0.0, matInterior);
+    addBox(houseGroup, 9.8, intH, 0.35, 7.0, hBase + intH / 2, 0.0, matInterior);
+    addBox(houseGroup, 0.35, intH, 19.6, -2.0, hBase + intH / 2, -10.0, matInterior);
+    addBox(houseGroup, 0.35, intH, 19.6, 2.0, hBase + intH / 2, -10.0, matInterior);
+    addBox(houseGroup, 9.8, intH, 0.35, -7.0, hBase + intH / 2, -10.0, matInterior);
+    addBox(houseGroup, 9.8, intH, 0.35, 7.0, hBase + intH / 2, -5.5, matInterior);
+    addBox(houseGroup, 9.8, intH, 0.35, 7.0, hBase + intH / 2, -10.0, matInterior);
+
+    // Muebles 3D clave (sofa, comedor, isla cocina, 3 camas)
+    const matSofa = new THREE.MeshStandardMaterial({ color: 0x3b6998, roughness: 0.85 });
+    const matCama = new THREE.MeshStandardMaterial({ color: 0xe8eef2, roughness: 0.9 });
+    const matManta = new THREE.MeshStandardMaterial({ color: 0x2b6cb0, roughness: 0.85 });
+    const matEncimera = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.3 });
+
+    addBox(houseGroup, 2.8, 2.1, 6.0, -9.4, hBase + 1.05, 4.0, matSofa);
+    addBox(houseGroup, 5.0, 2.5, 3.0, 0.0, hBase + 1.25, 7.5, matDeck);
+    addBox(houseGroup, 2.4, 3.0, 3.2, 6.4, hBase + 1.5, 6.2, matEncimera);
+    addBox(houseGroup, 6.0, 3.0, 2.2, 8.5, hBase + 1.5, 1.7, matEncimera);
+
+    // Camas en los 3 dormitorios
+    for (const [cx, cz, cw, cd] of [[-8.6, -6.1, 5.2, 6.2], [-8.6, -16.2, 5.2, 6.0], [8.2, -16.2, 6.0, 6.4]]) {
+      addBox(houseGroup, cw, 1.6, cd, cx, hBase + 0.8, cz, matCama);
+      addBox(houseGroup, cw + 0.08, 0.65, cd * 0.65, cx, hBase + 1.35, cz + cd * 0.15, matManta);
+    }
+
+    // Escalera trasera exterior resistente a inundacion (sube de Z=-32, Y=0 hasta Z=-20, Y=12.1)
+    const numPel = 18;
+    for (let i = 0; i < numPel; i++) {
+      const t = i / numPel;
+      addBox(houseGroup, 3.8, 0.35, 0.85, 0, 0.5 + t * 11.4, -32.0 + t * 11.2, matDeck);
+    }
+    // Descanso superior trasero
+    addBox(houseGroup, 4.6, 0.45, 3.2, 0, 12.1, -21.6, matDeck);
+
+    // =========================================================================
+    // 6. TECHO A 4 AGUAS (HIP ROOF 5:12) — GRUPO INDEPENDIENTE PARA TOGGLE
+    // =========================================================================
+    const roofGroup = new THREE.Group();
+    scene.add(roofGroup);
+
+    // Geometria exacta de techo a 4 aguas cubriendo toda la planta + Deck frontal (27' x 43')
+    const rW = 13.6;  // semiancho X (total 27.2')
+    const rL = 21.8;  // semilargo Z (total 43.6')
+    const ridgeL = 9.0; // semicumbrera Z
+    const rH = 5.4;   // altura cumbrera (pendiente ~5:12)
+    const rY = hBase + hMuro; // +21.32
+
+    const v = [
+      -rW, rY,  rL,   // 0: frente izq
+       rW, rY,  rL,   // 1: frente der
+       rW, rY, -rL,   // 2: atras der
+      -rW, rY, -rL,   // 3: atras izq
+       0,  rY + rH,  ridgeL,  // 4: cumbrera frente
+       0,  rY + rH, -ridgeL,  // 5: cumbrera atras
+    ];
+    const indices = [
+      0, 1, 4,          // faldón frontal (hacia el mar)
+      1, 2, 5, 1, 5, 4, // faldón derecho
+      2, 3, 5,          // faldón trasero
+      3, 0, 4, 3, 4, 5, // faldón izquierdo
+    ];
+    const roofGeo = new THREE.BufferGeometry();
+    roofGeo.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
+    roofGeo.setIndex(indices);
+    roofGeo.computeVertexNormals();
+    const roofMesh = new THREE.Mesh(roofGeo, matTecho);
+    roofMesh.castShadow = true;
+    roofMesh.receiveShadow = true;
+    roofGroup.add(roofMesh);
+
+    // Fascia / cornisa blanca perimetral bajo el techo
+    addBox(roofGroup, rW * 2 + 0.1, 0.55, rL * 2 + 0.1, 0, rY - 0.18, 0, matTrim);
+
+    // =========================================================================
+    // 7. AMBIENTACION COSTERA (PALMERAS Y TABLA DE SURF PARA ESCALA REAL)
+    // =========================================================================
+    function addPalm(x, z, scale = 1.0) {
+      const g = new THREE.Group();
+      const trunkMat = new THREE.MeshStandardMaterial({ color: 0x8b6f4e, roughness: 0.92 });
+      const leafMat = new THREE.MeshStandardMaterial({ color: 0x2e7d32, roughness: 0.72, side: THREE.DoubleSide });
+      for (let i = 0; i < 8; i++) {
+        const seg = new THREE.Mesh(new THREE.CylinderGeometry(0.42 - i * 0.03, 0.48 - i * 0.03, 2.5, 8), trunkMat);
+        seg.position.set(Math.sin(i * 0.22) * 1.1, 1.2 + i * 2.3, Math.cos(i * 0.18) * 0.5);
+        seg.rotation.z = -0.08 * i;
+        seg.castShadow = true;
+        g.add(seg);
+      }
+      const top = new THREE.Vector3(Math.sin(7 * 0.22) * 1.1, 18.6, Math.cos(7 * 0.18) * 0.5);
+      for (let a = 0; a < 7; a++) {
+        const ang = (a / 7) * Math.PI * 2;
+        const frond = new THREE.Mesh(new THREE.ConeGeometry(1.4, 8.5, 4), leafMat);
+        frond.scale.set(0.5, 1, 0.18);
+        frond.position.copy(top).add(new THREE.Vector3(Math.cos(ang) * 3.4, -0.8, Math.sin(ang) * 3.4));
+        frond.rotation.z = Math.cos(ang) * 1.25;
+        frond.rotation.x = -Math.sin(ang) * 1.25;
+        frond.castShadow = true;
+        g.add(frond);
+      }
+      g.position.set(x, 0, z);
+      g.scale.setScalar(scale);
+      scene.add(g);
+    }
+    addPalm(-22, 16, 1.05);
+    addPalm(23, 12, 0.92);
+    addPalm(-25, -14, 1.15);
+    addPalm(26, -18, 1.0);
+
+    // =========================================================================
+    // 8. CONTROLES INTERACTIVOS Y CAMARAS
+    // =========================================================================
+    let xrayOn = false, floodOn = false, roofUp = false, sunsetOn = false;
+    let targetRoofY = 0, targetFloodY = -3.0;
+
+    window.setCamera = (preset) => {
+      const presets = {
+        hero:    { pos: [38, 22, 46],  target: [0, 12, 2] },
+        ocean:   { pos: [0, 17, 56],   target: [0, 14, 6] },
+        pilings: { pos: [24, 6, 32],   target: [0, 4, 4] },
+        top:     { pos: [0, 68, 18],   target: [0, 12, 0] },
+      };
+      const p = presets[preset];
+      if (!p) return;
+      camera.position.set(...p.pos);
+      controls.target.set(...p.target);
+      controls.update();
+    };
+
+    window.toggleXray = () => {
+      xrayOn = !xrayOn;
+      matArena.opacity = xrayOn ? 0.28 : 1.0;
+      scourPlane.visible = xrayOn;
+      document.getElementById("btn-xray").classList.toggle("active", xrayOn);
+    };
+
+    window.toggleFlood = () => {
+      floodOn = !floodOn;
+      floodMesh.visible = true;
+      targetFloodY = floodOn ? 9.0 : -3.0;
+      document.getElementById("btn-flood").classList.toggle("active", floodOn);
+    };
+
+    window.toggleRoof = () => {
+      roofUp = !roofUp;
+      targetRoofY = roofUp ? 14.0 : 0.0;
+      document.getElementById("btn-roof").classList.toggle("active", roofUp);
+    };
+
+    window.toggleSunset = () => {
+      sunsetOn = !sunsetOn;
+      if (sunsetOn) {
+        skyMat.uniforms.topColor.value.set(0x1e2952);
+        skyMat.uniforms.bottomColor.value.set(0xf59e56);
+        sunLight.color.set(0xffb56b);
+        sunLight.position.set(-70, 22, 60);
+        sunLight.intensity = 2.4;
+        scene.fog.color.set(0xdf9c6e);
+      } else {
+        skyMat.uniforms.topColor.value.set(0x2a76c7);
+        skyMat.uniforms.bottomColor.value.set(0xdcf1ff);
+        sunLight.color.set(0xfff6e5);
+        sunLight.position.set(55, 68, 45);
+        sunLight.intensity = 2.2;
+        scene.fog.color.set(0xcde7f7);
+      }
+      document.getElementById("btn-sun").classList.toggle("active", sunsetOn);
+    };
+
+    window.captureSquare = () => {
+      const size = 1080;
+      const oldW = window.innerWidth, oldH = window.innerHeight;
+      camera.aspect = 1.0;
+      camera.updateProjectionMatrix();
+      renderer.setSize(size, size);
+      renderer.render(scene, camera);
+      const url = renderer.domElement.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "casa_playa_usa_3d_1_1.png";
+      a.click();
+      camera.aspect = oldW / oldH;
+      camera.updateProjectionMatrix();
+      renderer.setSize(oldW, oldH);
+    };
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Animacion fluida (olas del mar + transiciones suaves de techo e inundacion)
+    const clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      // Oleaje suave en el oceano
+      const op = oceanGeo.attributes.position;
+      for (let i = 0; i < op.count; i++) {
+        const ox = op.getX(i);
+        const oz = op.getZ(i);
+        op.setY(i, Math.sin(oz * 0.14 + t * 1.8) * 0.42 + Math.cos(ox * 0.09 + t * 1.2) * 0.22);
+      }
+      op.needsUpdate = true;
+
+      roofGroup.position.y += (targetRoofY - roofGroup.position.y) * 0.08;
+      if (floodMesh.visible) {
+        floodMesh.position.y += (targetFloodY - floodMesh.position.y) * 0.06;
+        if (!floodOn && floodMesh.position.y < -2.6) floodMesh.visible = false;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+  </script>
+</body>
+</html>
