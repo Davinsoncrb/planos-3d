@@ -334,7 +334,7 @@
       controls.dampingFactor = 0.06;
       controls.target.set(...firstCam.target);
       controls.maxPolarAngle = Math.PI * 0.62;
-      controls.minDistance = 8;
+      controls.minDistance = 4;
       controls.maxDistance = 160;
 
       // Luces y Cielo
@@ -389,6 +389,27 @@
           let h = 0;
           if (pz > 28) h = -Math.min(7.5, (pz - 28) * 0.14);
           else if (Math.hypot(px, pz) > 26) h = Math.sin(px * 0.08) * Math.cos(pz * 0.07) * 1.1;
+          gp.setY(i, h);
+        }
+        gGeo.computeVertexNormals();
+      } else if (env.groundType === "river_bank") {
+        const gp = gGeo.attributes.position;
+        for (let i = 0; i < gp.count; i++) {
+          const px = gp.getX(i), pz = gp.getZ(i);
+          let h = -0.95;
+          if (pz < -3.2) {
+            // Cauce profundo del rio
+            const t = Math.min(1, (-3.2 - pz) / 3.0);
+            h = -0.95 - t * 1.15;
+          } else if (pz > 2.4) {
+            // Talud subiendo a la terraza agricola de riego (+1.75 m)
+            const t = Math.min(1, (pz - 2.4) / 2.6);
+            h = -0.95 + t * 2.70;
+          }
+          // Suave ondulacion natural fuera de la zona de obra
+          if (Math.abs(px) > 7.5 || pz > 8.5) {
+            h += Math.sin(px * 0.18) * Math.cos(pz * 0.16) * 0.18;
+          }
           gp.setY(i, h);
         }
         gGeo.computeVertexNormals();
