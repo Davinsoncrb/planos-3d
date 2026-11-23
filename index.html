@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planos Arquitectónicos y Visores 3D — drakkomaldito</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(160deg, #0b1622 0%, #13273d 100%);
+      color: #f1f5f9;
+      min-height: 100vh;
+      padding: 28px 16px 60px;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid rgba(224, 165, 56, 0.35);
+      margin-bottom: 28px;
+    }
+    h1 {
+      font-family: "Bahnschrift", "Segoe UI", sans-serif;
+      font-size: 28px;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+    .sub { color: #e9c77b; font-size: 14px; margin-top: 4px; }
+    .btn-star {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e0a538;
+      color: #0f172a;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 18px;
+      border-radius: 10px;
+    }
+    .btn-star:hover { filter: brightness(1.08); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: rgba(15, 30, 48, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+      display: flex;
+      flex-direction: column;
+    }
+    .card-head {
+      background: linear-gradient(135deg, #16324f, #0d2136);
+      padding: 18px;
+      border-bottom: 2px solid #e0a538;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #0f172a;
+      background: #e0a538;
+      padding: 3px 8px;
+      border-radius: 5px;
+      margin-bottom: 8px;
+    }
+    .card-head h2 {
+      font-family: "Bahnschrift", "Segoe UI", sans-serif;
+      font-size: 20px;
+      color: #ffffff;
+    }
+    .card-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .specs { font-size: 13px; color: #cbd5e1; line-height: 1.5; }
+    .actions { display: flex; flex-direction: column; gap: 8px; margin-top: auto; padding-top: 8px; }
+    .btn {
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 13.5px;
+      padding: 11px 14px;
+      border-radius: 9px;
+    }
+    .btn-3d { background: #0284c7; color: #ffffff; }
+    .btn-3d:hover { background: #0369a1; }
+    .btn-drive { background: #16a34a; color: #ffffff; }
+    .btn-drive:hover { background: #15803d; }
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>PLANOS CAD Y VISORES 3D INTERACTIVOS</h1>
+        <p class="sub">Explora los proyectos en 3D desde tu celular o PC y descarga los planos completos (PDF + DXF).</p>
+      </div>
+      <a class="btn-star" href="https://github.com/drakkomaldito/planos-3d" target="_blank" rel="noopener">
+        ⭐ Apoyar con una Estrella en GitHub
+      </a>
+    </header>
+
+    <main class="grid">
+      <article class="card">
+        <div class="card-head">
+          <span class="tag">Proyecto 01 · Norma USA</span>
+          <h2>Casa de Playa USA — FEMA Zone VE</h2>
+        </div>
+        <div class="card-body">
+          <p class="specs">
+            • <strong>Medidas:</strong> 24' × 40' (7.32 × 12.19 m) · 3 Dormitorios + Deck al mar<br />
+            • <strong>Suelo arenoso:</strong> 20 pilotes empotrados -16'-0", elevación +12'-0", Breakaway Wall y techo Hip Roof 5:12<br />
+            • <strong>Incluye:</strong> PDF vectorial (6 láminas + Memoria y Metrados) + 5 DXF editables
+          </p>
+          <div class="actions">
+            <a class="btn btn-3d" href="./casa-playa-usa/">Abrir Visor 3D Interactivo 360°</a>
+            <a class="btn btn-drive" href="https://drive.google.com/drive/folders/1XDAKmyvb106Ur9Gl4cglAFWBrIf-xdK7" target="_blank" rel="noopener">
+              Descargar Planos Completos (Google Drive)
+            </a>
+          </div>
+        </div>
+      </article>
+    </main>
+
+    <footer>
+      Proyectos modelo de referencia técnica. Para construcción real en obra, validar con estudio de suelos e ingeniero colegiado / Licensed PE.
+    </footer>
+  </div>
+</body>
+</html>
