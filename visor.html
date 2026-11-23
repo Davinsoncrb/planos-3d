@@ -199,7 +199,7 @@
     import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
     const params = new URLSearchParams(window.location.search);
-    const projectId = (params.get("p") || "casa-playa-usa").replace(/[^a-zA-Z0-9_-]/g, "");
+    const projectId = (params.get("p") || "casa-mexico-5x12").replace(/[^a-zA-Z0-9_-]/g, "");
 
     async function loadProject() {
       const res = await fetch(`./datos/${projectId}.json`, { cache: "no-store" });
