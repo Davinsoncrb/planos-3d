@@ -1,0 +1,635 @@
+{
+  "id": "cocina-minimalista-240",
+  "titulo": "Cocina Integral Minimalista Compacta (2.40 m)",
+  "subtitulo": "Modulación 4×60 cm · Melamina Hidrófuga RH Grafito + Perfil Gola + Cuarzo Blanco + Alacenas Roble LED",
+  "driveUrl": "https://drive.google.com/drive/folders/1M6W3ewMPVjqz7hrMclTQzbm3dFN9ZsOB",
+  "githubRepo": "https://github.com/Davinsoncrb/planos-3d",
+  "cameras": [
+    {
+      "id": "hero",
+      "label": "Vista 3/4 Frontal",
+      "pos": [
+        -8.5,
+        6.2,
+        10.5
+      ],
+      "target": [
+        0.0,
+        3.8,
+        0.0
+      ]
+    },
+    {
+      "id": "frente",
+      "label": "Alzado Completo",
+      "pos": [
+        0.0,
+        4.4,
+        13.5
+      ],
+      "target": [
+        0.0,
+        4.0,
+        0.0
+      ]
+    },
+    {
+      "id": "coccion",
+      "label": "Zona Cocción/Horno",
+      "pos": [
+        4.5,
+        4.2,
+        7.2
+      ],
+      "target": [
+        1.5,
+        3.2,
+        0.0
+      ]
+    },
+    {
+      "id": "tarja",
+      "label": "Zona Tarja/Gola",
+      "pos": [
+        -5.2,
+        4.2,
+        6.8
+      ],
+      "target": [
+        -2.2,
+        3.2,
+        0.0
+      ]
+    }
+  ],
+  "badges": [
+    {
+      "k": "MEDIDAS",
+      "v": "240 × 62 × 235 cm (4×60 cm)"
+    },
+    {
+      "k": "BAJOS RH",
+      "v": "Grafito Mate + Perfil Gola"
+    },
+    {
+      "k": "ENCIMERA",
+      "v": "Cuarzo Blanco 38 mm (h=90)"
+    },
+    {
+      "k": "ALACENAS",
+      "v": "Roble Natural + Tira LED"
+    }
+  ],
+  "environment": {
+    "groundSize": 42,
+    "groundType": "urban",
+    "groundColor": "#d8d1c5"
+  },
+  "toggles": {
+    "xrayLabel": "Rayos X Piso / Base",
+    "upperLabel": "Levantar Encimera Cuarzo (Ver Módulos)",
+    "upperLiftY": 1.6,
+    "roofLabel": "Levantar Alacenas Roble LED",
+    "roofLiftY": 1.8
+  },
+  "materials": {
+    "muro_blanco": {
+      "color": "#efeae2",
+      "roughness": 0.9,
+      "metalness": 0.0
+    },
+    "melamina_grafito": {
+      "color": "#262b33",
+      "roughness": 0.62,
+      "metalness": 0.05
+    },
+    "roble_natural": {
+      "type": "wood",
+      "c1": "#c9a276",
+      "c2": "#a67c52",
+      "roughness": 0.6
+    },
+    "cuarzo_blanco": {
+      "color": "#f6f7f9",
+      "roughness": 0.22,
+      "metalness": 0.05
+    },
+    "acero_negro": {
+      "color": "#14181f",
+      "roughness": 0.4,
+      "metalness": 0.72
+    },
+    "acero_cromo": {
+      "color": "#cbd5e1",
+      "roughness": 0.22,
+      "metalness": 0.88
+    },
+    "acero_tarja": {
+      "color": "#94a3b8",
+      "roughness": 0.3,
+      "metalness": 0.82
+    },
+    "vidrio_horno": {
+      "color": "#0f172a",
+      "roughness": 0.12,
+      "metalness": 0.45
+    },
+    "led_calido": {
+      "color": "#fde68a",
+      "roughness": 0.15,
+      "metalness": 0.0
+    },
+    "tubo_agua": {
+      "color": "#0284c7",
+      "roughness": 0.45,
+      "metalness": 0.2
+    },
+    "tubo_caliente": {
+      "color": "#dc2626",
+      "roughness": 0.45,
+      "metalness": 0.2
+    },
+    "tubo_drenaje": {
+      "color": "#64748b",
+      "roughness": 0.6,
+      "metalness": 0.1
+    }
+  },
+  "boxes": [
+    {
+      "w": 15.0,
+      "h": 11.0,
+      "d": 0.28,
+      "x": 0.0,
+      "y": 5.5,
+      "z": -1.235,
+      "mat": "muro_blanco",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 8.4,
+      "h": 2.31,
+      "d": 0.08750000000000001,
+      "x": 0.0,
+      "y": 4.305,
+      "z": -1.08,
+      "mat": "cuarzo_blanco",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 8.26,
+      "h": 0.35000000000000003,
+      "d": 1.8199999999999998,
+      "x": 0.0,
+      "y": 0.175,
+      "z": -0.185,
+      "mat": "acero_negro",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 8.4,
+      "h": 0.168,
+      "d": 0.12250000000000001,
+      "x": 0.0,
+      "y": 2.933,
+      "z": 0.918,
+      "mat": "acero_negro",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 2.667,
+      "d": 2.03,
+      "x": -3.15,
+      "y": 1.683,
+      "z": -0.08,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.485,
+      "d": 0.063,
+      "x": -3.675,
+      "y": 1.593,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.485,
+      "d": 0.063,
+      "x": -2.625,
+      "y": 1.593,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 2.667,
+      "d": 2.03,
+      "x": -1.05,
+      "y": 1.683,
+      "z": -0.08,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 0.9520000000000001,
+      "d": 0.063,
+      "x": -1.05,
+      "y": 0.854,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 0.9520000000000001,
+      "d": 0.063,
+      "x": -1.05,
+      "y": 1.834,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 0.4689999999999999,
+      "d": 0.063,
+      "x": -1.05,
+      "y": 2.573,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 2.667,
+      "d": 2.03,
+      "x": 1.05,
+      "y": 1.683,
+      "z": -0.08,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 1.995,
+      "h": 1.9600000000000002,
+      "d": 0.08750000000000001,
+      "x": 1.05,
+      "y": 1.75,
+      "z": 0.995,
+      "mat": "vidrio_horno",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 1.54,
+      "h": 0.063,
+      "d": 0.112,
+      "x": 1.05,
+      "y": 2.31,
+      "z": 1.089,
+      "mat": "acero_cromo",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.065,
+      "h": 0.385,
+      "d": 0.063,
+      "x": 1.05,
+      "y": 0.553,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 2.667,
+      "d": 2.03,
+      "x": 3.15,
+      "y": 1.683,
+      "z": -0.08,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.485,
+      "d": 0.063,
+      "x": 2.625,
+      "y": 1.593,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.485,
+      "d": 0.063,
+      "x": 3.675,
+      "y": 1.593,
+      "z": 0.977,
+      "mat": "melamina_grafito",
+      "group": "base",
+      "shadow": true
+    },
+    {
+      "w": 8.4,
+      "h": 0.133,
+      "d": 2.17,
+      "x": 0.0,
+      "y": 3.083,
+      "z": -0.01,
+      "mat": "cuarzo_blanco",
+      "group": "upper",
+      "shadow": true
+    },
+    {
+      "w": 1.75,
+      "h": 0.042,
+      "d": 1.4000000000000001,
+      "x": -3.15,
+      "y": 3.164,
+      "z": 0.06,
+      "mat": "acero_tarja",
+      "group": "upper",
+      "shadow": false
+    },
+    {
+      "w": 0.112,
+      "h": 0.112,
+      "d": 0.63,
+      "x": -3.15,
+      "y": 4.165,
+      "z": -0.5,
+      "mat": "acero_negro",
+      "group": "upper",
+      "shadow": true
+    },
+    {
+      "w": 1.26,
+      "h": 0.077,
+      "d": 0.91,
+      "x": -1.05,
+      "y": 3.188,
+      "z": 0.165,
+      "mat": "roble_natural",
+      "group": "upper",
+      "shadow": true
+    },
+    {
+      "w": 1.9600000000000002,
+      "h": 0.049,
+      "d": 1.7149999999999999,
+      "x": 1.05,
+      "y": 3.175,
+      "z": 0.06,
+      "mat": "vidrio_horno",
+      "group": "upper",
+      "shadow": true
+    },
+    {
+      "w": 8.19,
+      "h": 0.049,
+      "d": 0.084,
+      "x": 0.0,
+      "y": 5.226,
+      "z": -0.692,
+      "mat": "led_calido",
+      "group": "roof",
+      "shadow": false
+    },
+    {
+      "w": 2.072,
+      "h": 2.975,
+      "d": 1.2249999999999999,
+      "x": -3.15,
+      "y": 6.737,
+      "z": -0.482,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.954,
+      "d": 0.063,
+      "x": -3.675,
+      "y": 6.737,
+      "z": 0.165,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.954,
+      "d": 0.063,
+      "x": -2.625,
+      "y": 6.737,
+      "z": 0.165,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 2.975,
+      "d": 1.2249999999999999,
+      "x": -1.05,
+      "y": 6.737,
+      "z": -0.482,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.954,
+      "d": 0.063,
+      "x": -1.575,
+      "y": 6.737,
+      "z": 0.165,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 1.022,
+      "h": 2.954,
+      "d": 0.063,
+      "x": -0.525,
+      "y": 6.737,
+      "z": 0.165,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 2.8000000000000003,
+      "d": 1.2249999999999999,
+      "x": 1.05,
+      "y": 6.825,
+      "z": -0.482,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 2.0300000000000002,
+      "h": 0.14,
+      "d": 1.1549999999999998,
+      "x": 1.05,
+      "y": 5.372,
+      "z": -0.482,
+      "mat": "acero_negro",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 1.575,
+      "d": 1.2249999999999999,
+      "x": 3.15,
+      "y": 7.438,
+      "z": -0.482,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 2.072,
+      "h": 0.08750000000000001,
+      "d": 1.295,
+      "x": 3.15,
+      "y": 5.292,
+      "z": -0.447,
+      "mat": "roble_natural",
+      "group": "roof",
+      "shadow": true
+    },
+    {
+      "w": 1.8900000000000001,
+      "h": 1.1900000000000002,
+      "d": 1.1900000000000002,
+      "x": 3.15,
+      "y": 5.95,
+      "z": -0.447,
+      "mat": "vidrio_horno",
+      "group": "roof",
+      "shadow": true
+    }
+  ],
+  "cylinders": [
+    {
+      "r": 0.0525,
+      "h": 1.9250000000000003,
+      "seg": 12,
+      "x": -3.43,
+      "y": 0.98,
+      "z": -1.055,
+      "mat": "tubo_agua",
+      "group": "foundation",
+      "shadow": false
+    },
+    {
+      "r": 0.0525,
+      "h": 1.9250000000000003,
+      "seg": 12,
+      "x": -2.87,
+      "y": 0.98,
+      "z": -1.055,
+      "mat": "tubo_caliente",
+      "group": "foundation",
+      "shadow": false
+    },
+    {
+      "r": 0.098,
+      "h": 1.575,
+      "seg": 14,
+      "x": -3.15,
+      "y": 0.77,
+      "z": -1.045,
+      "mat": "tubo_drenaje",
+      "group": "foundation",
+      "shadow": false
+    },
+    {
+      "r": 0.063,
+      "h": 1.05,
+      "seg": 16,
+      "x": -3.15,
+      "y": 3.675,
+      "z": -0.78,
+      "mat": "acero_negro",
+      "group": "upper",
+      "shadow": true
+    },
+    {
+      "r": 0.2625,
+      "h": 0.021,
+      "seg": 20,
+      "x": 0.56,
+      "y": 3.203,
+      "z": -0.325,
+      "mat": "acero_negro",
+      "group": "upper",
+      "shadow": false
+    },
+    {
+      "r": 0.2625,
+      "h": 0.021,
+      "seg": 20,
+      "x": 1.54,
+      "y": 3.203,
+      "z": -0.325,
+      "mat": "acero_negro",
+      "group": "upper",
+      "shadow": false
+    },
+    {
+      "r": 0.2625,
+      "h": 0.021,
+      "seg": 20,
+      "x": 0.56,
+      "y": 3.203,
+      "z": 0.445,
+      "mat": "acero_negro",
+      "group": "upper",
+      "shadow": false
+    },
+    {
+      "r": 0.2625,
+      "h": 0.021,
+      "seg": 20,
+      "x": 1.54,
+      "y": 3.203,
+      "z": 0.445,
+      "mat": "acero_negro",
+      "group": "upper",
+      "shadow": false
+    }
+  ]
+}
